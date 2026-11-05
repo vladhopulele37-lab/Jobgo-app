@@ -9,19 +9,43 @@
 <body class="bg-gray-50">
 <header class="bg-[#102b52] text-white p-6">
 <h1 class="text-3xl font-black">JOBGO<span class="text-[#55b6ff]">.</span></h1>
-<p>Find your future - simple and fast</p>
+<p class="opacity-80 text-sm mt-1">Find your future - simple and fast</p>
 </header>
 <div class="p-6 max-w-3xl mx-auto">
-<h2 class="text-4xl font-bold mt-10 text-center">Găsește jobul<br><span class="text-blue-600">perfect</span> azi</h2>
+<h2 class="text-4xl font-black mt-10 text-center">Găsește jobul<br><span class="text-blue-600">perfect</span> azi</h2>
 <div class="bg-white mt-8 p-2 rounded-full shadow-lg flex">
-<input class="flex-1 px-6 py-3 outline-none rounded-full" placeholder="Ce job cauți?">
-<button class="bg-[#102b52] text-white px-8 py-3 rounded-full">Caută</button>
+<input id="searchInput" class="flex-1 px-6 py-3 outline-none rounded-full" placeholder="Scrie: bruxelles, remote, frontend...">
+<button id="searchBtn" class="bg-[#102b52] text-white px-8 py-3 rounded-full font-bold">Caută</button>
 </div>
-<div class="grid gap-4 mt-10">
-<div class="bg-white p-5 rounded-2xl border"><b>Frontend Developer</b> - Remote - $4.5k</div>
-<div class="bg-white p-5 rounded-2xl border"><b>Junior UX Designer</b> - Brussels - $2k</div>
-<div class="bg-white p-5 rounded-2xl border"><b>Backend Intern</b> - Leuven - $1.2k</div>
+<p id="resultInfo" class="text-center text-sm text-gray-500 mt-4">5 joburi</p>
+<div id="jobsList" class="grid gap-4 mt-6">
+<div class="job-card bg-white p-5 rounded-2xl border" data-search="frontend developer remote 4.5k"><b>Frontend Developer</b> - Remote - $4.5k</div>
+<div class="job-card bg-white p-5 rounded-2xl border" data-search="junior ux designer brussels bruxelles brussel 2k"><b>Junior UX Designer</b> - Brussels - $2k</div>
+<div class="job-card bg-white p-5 rounded-2xl border" data-search="backend intern leuven 1.2k"><b>Backend Intern</b> - Leuven - $1.2k</div>
+<div class="job-card bg-white p-5 rounded-2xl border" data-search="marketing manager antwerpen 3k"><b>Marketing Manager</b> - Antwerpen - $3k</div>
+<div class="job-card bg-white p-5 rounded-2xl border" data-search="data analyst hasselt remote 3.5k"><b>Data Analyst</b> - Hasselt - $3.5k</div>
 </div>
+<div id="noResult" class="hidden text-center mt-10 font-bold">Nici un job găsit 😕</div>
 </div>
+<script>
+const input = document.getElementById('searchInput');
+const btn = document.getElementById('searchBtn');
+const cards = document.querySelectorAll('.job-card');
+const info = document.getElementById('resultInfo');
+const noRes = document.getElementById('noResult');
+function filterJobs(){
+  const q = input.value.toLowerCase().trim();
+  let visible = 0;
+  cards.forEach(c=>{
+    if(c.dataset.search.includes(q)){
+      c.style.display='block'; visible++;
+    } else { c.style.display='none'; }
+  });
+  info.textContent = visible + ' joburi găsite';
+  noRes.classList.toggle('hidden', visible!==0);
+}
+btn.onclick = filterJobs;
+input.addEventListener('input', filterJobs);
+</script>
 </body>
 </html>
