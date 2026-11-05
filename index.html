@@ -36,7 +36,7 @@
 <span id="modalLocation" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
 <span id="modalType" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
 </div>
-<button id="showFormBtn" onclick="showForm()" class="w-full mt-7 bg-[#102b52] text-white py-4 rounded-full font-bold text-lg">Aplică acum 🚀</button>
+<button onclick="showForm()" class="w-full mt-7 bg-[#102b52] text-white py-4 rounded-full font-bold text-lg">Aplică acum 🚀</button>
 </div>
 <div id="applyFormDiv" class="hidden">
 <h4 class="font-bold text-lg mt-6 mb-4">Completează aplicarea ta:</h4>
@@ -62,7 +62,7 @@
 <script>
 const jobs = [
   {title:"Frontend Developer", company:"TechFlow • Remote", loc:"Remote", type:"Full-time", salary:"$4.5k - $6k", search:"frontend developer remote 4.5k", desc:"Căutăm Frontend Developer pasionat de React și Tailwind. Remote complet."},
-  {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în Figma, înveți UX alături de seniori."},
+  {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în 【entity-Figma¦canonical_name=Figma】, înveți UX alături de seniori."},
   {title:"Backend Intern", company:"Startup • Leuven", loc:"Leuven", type:"Internship", salary:"$1.2k - $1.8k", search:"backend intern leuven 1.2k", desc:"Internship plătit pentru juniori. Node.js, baze de date, API-uri."},
   {title:"Marketing Manager", company:"MediaGo • Antwerpen", loc:"Antwerpen", type:"Full-time", salary:"$3k - $5k", search:"marketing manager antwerpen 3k", desc:"Conduci campanii pentru branduri mari."},
   {title:"Data Analyst", company:"DataLab • Hasselt / Remote", loc:"Hasselt", type:"Remote", salary:"$3.5k - $4.5k", search:"data analyst hasselt remote 3.5k", desc:"Analizezi date, SQL și Python. Hybrid sau full remote."}
@@ -111,17 +111,47 @@ function submitForm(e){
   e.preventDefault();
   const form = e.target;
   const name = form.name.value;
-  const email = form.email.value;
+  const emailVal = form.email.value;
   const job = document.getElementById('jobTitleInput').value;
-  const apps = JSON.parse(localStorage.getItem('jobgo_apps')||'[]');
-  apps.push({job, name, email, date: new Date().toLocaleString()});
-  localStorage.setItem('jobgo_apps', JSON.stringify(apps));
-  document.getElementById('applyFormDiv').classList.add('hidden');
-  document.getElementById('successJob').textContent=job;
-  document.getElementById('successName').textContent=name;
-  document.getElementById('successEmail').textContent=email;
-  document.getElementById('successDiv').classList.remove('hidden');
-  form.reset();
+  const btn = form.querySelector('button[type="submit"]');
+  const oldText = btn.textContent;
+  btn.textContent = 'Se trimite... ⏳';
+  btn.disabled = true;
+  const formData = new FormData(form);
+  formData.append('_subject', 'Aplicare noua Jobgo: ' + job + ' de la ' + name);
+  formData.append('_captcha', 'false');
+  formData.append('_template', 'table');
+  fetch('https://formsubmit.co/ajax/vladhopulele37@gmail.com', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    const apps = JSON.parse(localStorage.getItem('jobgo_apps')||'[]');
+    apps.push({job, name, email: emailVal, date: new Date().toLocaleString()});
+    localStorage.setItem('jobgo_apps', JSON.stringify(apps));
+    document.getElementById('applyFormDiv').classList.add('hidden');
+    document.getElementById('successJob').textContent=job;
+    document.getElementById('successName').textContent=name;
+    document.getElementById('successEmail').textContent=emailVal;
+    document.getElementById('successDiv').classList.remove('hidden');
+    form.reset();
+    btn.textContent = oldText;
+    btn.disabled = false;
+  })
+  .catch(error => {
+    const apps = JSON.parse(localStorage.getItem('jobgo_apps')||'[]');
+    apps.push({job, name, email: emailVal, date: new Date().toLocaleString()});
+    localStorage.setItem('jobgo_apps', JSON.stringify(apps));
+    document.getElementById('applyFormDiv').classList.add('hidden');
+    document.getElementById('successJob').textContent=job;
+    document.getElementById('successName').textContent=name;
+    document.getElementById('successEmail').textContent=emailVal;
+    document.getElementById('successDiv').classList.remove('hidden');
+    form.reset();
+    btn.textContent = oldText;
+    btn.disabled = false;
+  });
 }
 modal.onclick=(e)=>{ if(e.target===modal) closeModal(); };
 document.getElementById('searchBtn').onclick=()=>render(input.value);
