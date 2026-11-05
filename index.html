@@ -40,11 +40,11 @@
 </div>
 <script>
 const jobs = [
-  {title:"Frontend Developer", company:"TechFlow • Remote", loc:"Remote", type:"Full-time", salary:"$4.5k - $6k", search:"frontend developer remote 4.5k", desc:"Căutăm Frontend Developer pasionat de React și Tailwind. Vei lucra la produse folosite de mii de oameni. Remote complet."},
+  {title:"Frontend Developer", company:"TechFlow • Remote", loc:"Remote", type:"Full-time", salary:"$4.5k - $6k", search:"frontend developer remote 4.5k", desc:"Căutăm Frontend Developer pasionat de React și Tailwind. Remote complet."},
   {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în 【entity-Figma¦canonical_name=Figma】, înveți UX alături de seniori. Birou în centrul Bruxelles-ului."},
-  {title:"Backend Intern", company:"Startup • Leuven", loc:"Leuven", type:"Internship", salary:"$1.2k - $1.8k", search:"backend intern leuven 1.2k", desc:"Internship plătit pentru juniori. Node.js, baze de date, API-uri. Mentor dedicat."},
-  {title:"Marketing Manager", company:"MediaGo • Antwerpen", loc:"Antwerpen", type:"Full-time", salary:"$3k - $5k", search:"marketing manager antwerpen 3k", desc:"Conduci campanii pentru branduri mari. Experiență în social media și ads."},
-  {title:"Data Analyst", company:"DataLab • Hasselt / Remote", loc:"Hasselt", type:"Remote", salary:"$3.5k - $4.5k", search:"data analyst hasselt remote 3.5k", desc:"Analizezi date, faci rapoarte, lucrezi cu SQL și Python. Hybrid sau full remote."}
+  {title:"Backend Intern", company:"Startup • Leuven", loc:"Leuven", type:"Internship", salary:"$1.2k - $1.8k", search:"backend intern leuven 1.2k", desc:"Internship plătit pentru juniori. Node.js, baze de date, API-uri."},
+  {title:"Marketing Manager", company:"MediaGo • Antwerpen", loc:"Antwerpen", type:"Full-time", salary:"$3k - $5k", search:"marketing manager antwerpen 3k", desc:"Conduci campanii pentru branduri mari."},
+  {title:"Data Analyst", company:"DataLab • Hasselt / Remote", loc:"Hasselt", type:"Remote", salary:"$3.5k - $4.5k", search:"data analyst hasselt remote 3.5k", desc:"Analizezi date, SQL și Python. Hybrid sau full remote."}
 ];
 const list = document.getElementById('jobsList');
 const input = document.getElementById('searchInput');
@@ -75,10 +75,27 @@ function openModal(i){
   document.getElementById('modalSalary').textContent=j.salary;
   document.getElementById('modalLocation').textContent=j.loc;
   document.getElementById('modalType').textContent=j.type;
+  document.getElementById('modalSalary').style.display='';
+  document.getElementById('modalLocation').style.display='';
+  document.getElementById('modalType').style.display='';
+  const btn = document.querySelector('#modal button[onclick="applyJob()"]');
+  btn.textContent='Aplică acum 🚀';
+  btn.onclick=applyJob;
   modal.classList.remove('hidden');
 }
 function closeModal(){ modal.classList.add('hidden'); }
-function applyJob(){ alert('🎉 Ai aplicat pentru: '+document.getElementById('modalTitle').textContent); closeModal(); }
+function applyJob(){
+  const title=document.getElementById('modalTitle').textContent;
+  document.getElementById('modalTitle').textContent='✅ Aplicat!';
+  document.getElementById('modalCompany').textContent='Felicitări!';
+  document.getElementById('modalDesc').innerHTML=`<div class='text-center py-4'><div class='text-5xl mb-4'>🎉</div><p class='text-lg font-bold'>Ai aplicat pentru<br>${title}</p><p class='text-sm text-gray-500 mt-3'>CV-ul tău a fost trimis!</p></div>`;
+  document.getElementById('modalSalary').style.display='none';
+  document.getElementById('modalLocation').style.display='none';
+  document.getElementById('modalType').style.display='none';
+  const btn = document.querySelector('#modal button[onclick="applyJob()"]');
+  btn.textContent='Închide';
+  btn.onclick=closeModal;
+}
 modal.onclick=(e)=>{ if(e.target===modal) closeModal(); };
 document.getElementById('searchBtn').onclick=()=>render(input.value);
 input.addEventListener('input', ()=>render(input.value));
