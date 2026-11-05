@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JOBGO - Find your future</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>.modal{backdrop-filter: blur(8px);}</style>
 </head>
 <body class="bg-gray-50">
 <header class="bg-[#102b52] text-white p-6">
@@ -18,34 +19,70 @@
 <button id="searchBtn" class="bg-[#102b52] text-white px-8 py-3 rounded-full font-bold">Caută</button>
 </div>
 <p id="resultInfo" class="text-center text-sm text-gray-500 mt-4">5 joburi</p>
-<div id="jobsList" class="grid gap-4 mt-6">
-<div class="job-card bg-white p-5 rounded-2xl border" data-search="frontend developer remote 4.5k"><b>Frontend Developer</b> - Remote - $4.5k</div>
-<div class="job-card bg-white p-5 rounded-2xl border" data-search="junior ux designer brussels bruxelles brussel 2k"><b>Junior UX Designer</b> - Brussels - $2k</div>
-<div class="job-card bg-white p-5 rounded-2xl border" data-search="backend intern leuven 1.2k"><b>Backend Intern</b> - Leuven - $1.2k</div>
-<div class="job-card bg-white p-5 rounded-2xl border" data-search="marketing manager antwerpen 3k"><b>Marketing Manager</b> - Antwerpen - $3k</div>
-<div class="job-card bg-white p-5 rounded-2xl border" data-search="data analyst hasselt remote 3.5k"><b>Data Analyst</b> - Hasselt - $3.5k</div>
-</div>
+<div id="jobsList" class="grid gap-4 mt-6"></div>
 <div id="noResult" class="hidden text-center mt-10 font-bold">Nici un job găsit 😕</div>
 </div>
+<div id="modal" class="hidden fixed inset-0 bg-black/50 modal flex items-center justify-center p-4 z-50">
+<div class="bg-white rounded-3xl max-w-md w-full p-7 shadow-2xl">
+<div class="flex justify-between items-start">
+<h3 id="modalTitle" class="text-2xl font-black"></h3>
+<button onclick="closeModal()" class="w-9 h-9 bg-gray-100 rounded-full">✕</button>
+</div>
+<p id="modalCompany" class="text-gray-500 text-sm mt-2"></p>
+<p id="modalDesc" class="mt-5 text-sm leading-relaxed text-gray-700"></p>
+<div class="flex gap-2 mt-6 flex-wrap">
+<span id="modalSalary" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-bold"></span>
+<span id="modalLocation" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
+<span id="modalType" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
+</div>
+<button onclick="applyJob()" class="w-full mt-7 bg-[#102b52] text-white py-4 rounded-full font-bold text-lg">Aplică acum 🚀</button>
+</div>
+</div>
 <script>
+const jobs = [
+  {title:"Frontend Developer", company:"TechFlow • Remote", loc:"Remote", type:"Full-time", salary:"$4.5k - $6k", search:"frontend developer remote 4.5k", desc:"Căutăm Frontend Developer pasionat de React și Tailwind. Vei lucra la produse folosite de mii de oameni. Remote complet."},
+  {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în 【entity-Figma¦canonical_name=Figma】, înveți UX alături de seniori. Birou în centrul Bruxelles-ului."},
+  {title:"Backend Intern", company:"Startup • Leuven", loc:"Leuven", type:"Internship", salary:"$1.2k - $1.8k", search:"backend intern leuven 1.2k", desc:"Internship plătit pentru juniori. Node.js, baze de date, API-uri. Mentor dedicat."},
+  {title:"Marketing Manager", company:"MediaGo • Antwerpen", loc:"Antwerpen", type:"Full-time", salary:"$3k - $5k", search:"marketing manager antwerpen 3k", desc:"Conduci campanii pentru branduri mari. Experiență în social media și ads."},
+  {title:"Data Analyst", company:"DataLab • Hasselt / Remote", loc:"Hasselt", type:"Remote", salary:"$3.5k - $4.5k", search:"data analyst hasselt remote 3.5k", desc:"Analizezi date, faci rapoarte, lucrezi cu SQL și Python. Hybrid sau full remote."}
+];
+const list = document.getElementById('jobsList');
 const input = document.getElementById('searchInput');
-const btn = document.getElementById('searchBtn');
-const cards = document.querySelectorAll('.job-card');
 const info = document.getElementById('resultInfo');
 const noRes = document.getElementById('noResult');
-function filterJobs(){
-  const q = input.value.toLowerCase().trim();
-  let visible = 0;
-  cards.forEach(c=>{
-    if(c.dataset.search.includes(q)){
-      c.style.display='block'; visible++;
-    } else { c.style.display='none'; }
+const modal = document.getElementById('modal');
+function render(filter=""){
+  list.innerHTML="";
+  let visible=0;
+  jobs.forEach((job, i)=>{
+    if(job.search.includes(filter.toLowerCase())){
+      visible++;
+      const div = document.createElement('div');
+      div.className="job-card bg-white p-5 rounded-2xl border hover:shadow-lg cursor-pointer";
+      div.innerHTML=`<b>${job.title}</b> - ${job.loc} - ${job.salary}<p class='text-sm text-gray-500 mt-1'>${job.company}</p>`;
+      div.onclick=()=>openModal(i);
+      list.appendChild(div);
+    }
   });
-  info.textContent = visible + ' joburi găsite';
+  info.textContent = visible + " joburi găsite";
   noRes.classList.toggle('hidden', visible!==0);
 }
-btn.onclick = filterJobs;
-input.addEventListener('input', filterJobs);
+function openModal(i){
+  const j = jobs[i];
+  document.getElementById('modalTitle').textContent=j.title;
+  document.getElementById('modalCompany').textContent=j.company;
+  document.getElementById('modalDesc').textContent=j.desc;
+  document.getElementById('modalSalary').textContent=j.salary;
+  document.getElementById('modalLocation').textContent=j.loc;
+  document.getElementById('modalType').textContent=j.type;
+  modal.classList.remove('hidden');
+}
+function closeModal(){ modal.classList.add('hidden'); }
+function applyJob(){ alert('🎉 Ai aplicat pentru: '+document.getElementById('modalTitle').textContent); closeModal(); }
+modal.onclick=(e)=>{ if(e.target===modal) closeModal(); };
+document.getElementById('searchBtn').onclick=()=>render(input.value);
+input.addEventListener('input', ()=>render(input.value));
+render();
 </script>
 </body>
 </html>
