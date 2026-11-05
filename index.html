@@ -22,26 +22,47 @@
 <div id="jobsList" class="grid gap-4 mt-6"></div>
 <div id="noResult" class="hidden text-center mt-10 font-bold">Nici un job găsit 😕</div>
 </div>
-<div id="modal" class="hidden fixed inset-0 bg-black/50 modal flex items-center justify-center p-4 z-50">
-<div class="bg-white rounded-3xl max-w-md w-full p-7 shadow-2xl">
+<div id="modal" class="hidden fixed inset-0 bg-black/50 modal flex items-center justify-center p-4 z-50 overflow-y-auto">
+<div class="bg-white rounded-3xl max-w-lg w-full p-7 shadow-2xl my-8">
 <div class="flex justify-between items-start">
 <h3 id="modalTitle" class="text-2xl font-black"></h3>
 <button onclick="closeModal()" class="w-9 h-9 bg-gray-100 rounded-full">✕</button>
 </div>
 <p id="modalCompany" class="text-gray-500 text-sm mt-2"></p>
+<div id="jobDetails">
 <p id="modalDesc" class="mt-5 text-sm leading-relaxed text-gray-700"></p>
-<div class="flex gap-2 mt-6 flex-wrap">
+<div class="flex gap-2 mt-4 flex-wrap">
 <span id="modalSalary" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-bold"></span>
 <span id="modalLocation" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
 <span id="modalType" class="px-3 py-1 bg-gray-100 rounded-full text-sm"></span>
 </div>
-<button onclick="applyJob()" class="w-full mt-7 bg-[#102b52] text-white py-4 rounded-full font-bold text-lg">Aplică acum 🚀</button>
+<button id="showFormBtn" onclick="showForm()" class="w-full mt-7 bg-[#102b52] text-white py-4 rounded-full font-bold text-lg">Aplică acum 🚀</button>
+</div>
+<div id="applyFormDiv" class="hidden">
+<h4 class="font-bold text-lg mt-6 mb-4">Completează aplicarea ta:</h4>
+<form id="realForm" onsubmit="submitForm(event)" class="space-y-4">
+<input type="hidden" id="jobTitleInput" name="job">
+<input type="text" name="name" required placeholder="Numele tău complet *" class="w-full px-4 py-3 border rounded-xl outline-none">
+<input type="email" name="email" required placeholder="Emailul tău *" class="w-full px-4 py-3 border rounded-xl outline-none">
+<input type="tel" name="phone" placeholder="Telefon (opțional)" class="w-full px-4 py-3 border rounded-xl outline-none">
+<input type="url" name="cv" placeholder="Link CV (Google Drive, LinkedIn) *" required class="w-full px-4 py-3 border rounded-xl outline-none">
+<textarea name="message" rows="3" placeholder="De ce vrei jobul ăsta?" class="w-full px-4 py-3 border rounded-xl outline-none"></textarea>
+<button type="submit" class="w-full bg-green-600 text-white py-4 rounded-full font-bold text-lg">Trimite aplicarea ✅</button>
+</form>
+</div>
+<div id="successDiv" class="hidden text-center py-6">
+<div class="text-5xl mb-4">🎉</div>
+<h4 class="text-2xl font-black">Aplicat cu succes!</h4>
+<p class="text-sm text-gray-500 mt-3">Am primit aplicarea ta pentru <b id="successJob"></b></p>
+<p class="text-xs text-gray-400 mt-4"><span id="successName"></span> • <span id="successEmail"></span></p>
+<button onclick="closeModal()" class="w-full mt-6 bg-[#102b52] text-white py-3 rounded-full font-bold">Închide</button>
+</div>
 </div>
 </div>
 <script>
 const jobs = [
   {title:"Frontend Developer", company:"TechFlow • Remote", loc:"Remote", type:"Full-time", salary:"$4.5k - $6k", search:"frontend developer remote 4.5k", desc:"Căutăm Frontend Developer pasionat de React și Tailwind. Remote complet."},
-  {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în 【entity-Figma¦canonical_name=Figma】, înveți UX alături de seniori. Birou în centrul Bruxelles-ului."},
+  {title:"Junior UX Designer", company:"Design Studio • Brussels", loc:"Brussels", type:"Part-time", salary:"$2k - $3k", search:"junior ux designer brussels bruxelles brussel 2k", desc:"Job perfect pentru început. Lucrezi în Figma, înveți UX alături de seniori."},
   {title:"Backend Intern", company:"Startup • Leuven", loc:"Leuven", type:"Internship", salary:"$1.2k - $1.8k", search:"backend intern leuven 1.2k", desc:"Internship plătit pentru juniori. Node.js, baze de date, API-uri."},
   {title:"Marketing Manager", company:"MediaGo • Antwerpen", loc:"Antwerpen", type:"Full-time", salary:"$3k - $5k", search:"marketing manager antwerpen 3k", desc:"Conduci campanii pentru branduri mari."},
   {title:"Data Analyst", company:"DataLab • Hasselt / Remote", loc:"Hasselt", type:"Remote", salary:"$3.5k - $4.5k", search:"data analyst hasselt remote 3.5k", desc:"Analizezi date, SQL și Python. Hybrid sau full remote."}
@@ -75,26 +96,32 @@ function openModal(i){
   document.getElementById('modalSalary').textContent=j.salary;
   document.getElementById('modalLocation').textContent=j.loc;
   document.getElementById('modalType').textContent=j.type;
-  document.getElementById('modalSalary').style.display='';
-  document.getElementById('modalLocation').style.display='';
-  document.getElementById('modalType').style.display='';
-  const btn = document.querySelector('#modal button[onclick="applyJob()"]');
-  btn.textContent='Aplică acum 🚀';
-  btn.onclick=applyJob;
+  document.getElementById('jobTitleInput').value=j.title;
+  document.getElementById('jobDetails').classList.remove('hidden');
+  document.getElementById('applyFormDiv').classList.add('hidden');
+  document.getElementById('successDiv').classList.add('hidden');
   modal.classList.remove('hidden');
 }
+function showForm(){
+  document.getElementById('jobDetails').classList.add('hidden');
+  document.getElementById('applyFormDiv').classList.remove('hidden');
+}
 function closeModal(){ modal.classList.add('hidden'); }
-function applyJob(){
-  const title=document.getElementById('modalTitle').textContent;
-  document.getElementById('modalTitle').textContent='✅ Aplicat!';
-  document.getElementById('modalCompany').textContent='Felicitări!';
-  document.getElementById('modalDesc').innerHTML=`<div class='text-center py-4'><div class='text-5xl mb-4'>🎉</div><p class='text-lg font-bold'>Ai aplicat pentru<br>${title}</p><p class='text-sm text-gray-500 mt-3'>CV-ul tău a fost trimis!</p></div>`;
-  document.getElementById('modalSalary').style.display='none';
-  document.getElementById('modalLocation').style.display='none';
-  document.getElementById('modalType').style.display='none';
-  const btn = document.querySelector('#modal button[onclick="applyJob()"]');
-  btn.textContent='Închide';
-  btn.onclick=closeModal;
+function submitForm(e){
+  e.preventDefault();
+  const form = e.target;
+  const name = form.name.value;
+  const email = form.email.value;
+  const job = document.getElementById('jobTitleInput').value;
+  const apps = JSON.parse(localStorage.getItem('jobgo_apps')||'[]');
+  apps.push({job, name, email, date: new Date().toLocaleString()});
+  localStorage.setItem('jobgo_apps', JSON.stringify(apps));
+  document.getElementById('applyFormDiv').classList.add('hidden');
+  document.getElementById('successJob').textContent=job;
+  document.getElementById('successName').textContent=name;
+  document.getElementById('successEmail').textContent=email;
+  document.getElementById('successDiv').classList.remove('hidden');
+  form.reset();
 }
 modal.onclick=(e)=>{ if(e.target===modal) closeModal(); };
 document.getElementById('searchBtn').onclick=()=>render(input.value);
